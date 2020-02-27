@@ -41,6 +41,7 @@ if form is valid:
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+
     form = RegistrationForm()
 
     if form.validate_on_submit():
@@ -65,6 +66,8 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
+            # when url has additional args
+            # redirect to THE login-required page instead of home page
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
@@ -78,6 +81,6 @@ def logout():
     return redirect(url_for('home'))
 
 @app.route("/account")
-@login_required
+@login_required         # must login in order to see this page
 def account():
     return render_template('account.html', title='Account')
