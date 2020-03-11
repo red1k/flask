@@ -1,4 +1,4 @@
-from flask import url_for, render_template, redirect, flash, request, Blueprint
+from flask import url_for, render_template, redirect, flash, request, Blueprint, session
 from flaskblog import db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog.models import User, Post
@@ -41,11 +41,15 @@ def login():
             # when url has additional args redirect to
             # THE login-required page instead of home page
             next_page = request.args.get('next')
+
+            # SESSION - email
+            session['email'] = form.email.data
+
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
             flash('Login unsuccessful bitch!', 'danger')
 
-    return render_template('login.html', title='login', form=form)
+    return render_template('login.html', title='login', form=form, email=session.get('email'))
 
 @users.route("/logout")
 def logout():
